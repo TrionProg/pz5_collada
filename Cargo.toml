@@ -1,0 +1,9 @@
+[package]
+name = "pz5_collada"
+version = "0.1.0"
+authors = ["trionprog <trionprog@gmail.com>"]
+
+[dependencies]
+pz5 = { path = "../pz5" }
+collada = { path = "../collada" }
+byteorder = "1.0.0"
