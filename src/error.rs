@@ -1,6 +1,27 @@
 use std;
 
 use collada;
+/*
+struct Error{
+    route:Route,
+    kind:ErrorKind,
+}
+
+impl Error{
+    pub fn new(stage:&Stage, kind:ErrorKind) -> Error{
+        Error{
+            route:Route::from(stage),
+            kind:kind,
+        }
+    }
+}
+
+macro_rules! throw{
+    ($kind:expr) => (
+        return Err(Error::new(current_stage,$kind))
+    )
+}
+*/
 
 #[derive(Debug)]
 pub enum Error{
@@ -22,6 +43,72 @@ impl std::fmt::Display for Error{
         }
     }
 }
+
+impl From<collada::Error> for Error {
+    fn from(error:collada::Error) -> Error {
+        Error::ColladaError(error)
+    }
+}
+/*
+pub trait NodeTrait:Clone{
+
+}
+
+struct Trace<'a,Node>{
+    stack:Vec<Node<'a>>,
+}
+
+impl<'a,Node:NodeTrait> Trace<'a,Node>{
+    pub fn new() -> Trace<'a,Node>{
+        Trace{
+            stack:Vec::with_capacity(4);
+        }
+    }
+
+    pub fn add(&mut self,trace_node:Node) -> TraceGuard<'a,Node>{
+        self.stack.push(trace_node);
+
+        TraceGuard::new(self);
+    }
+
+    fn pop(&mut self){
+        self.stack.pop();
+    }
+}
+
+impl<'a,Node> Clone for Trace<'a,Node> {
+    fn clone(&'a self) -> Trace<'a,Node> {
+        let mut nodes=Vec::with_capacity(self.stack.len());
+
+        for node in self.stack.iter(){
+            nodes.push(node.clone());
+        }
+
+        Trace{
+            stack:nodes,
+        }
+    }
+}
+
+struct TraceGuard<'a,Node:NodeTrait>{
+    trace:&'a trace,
+}
+
+impl<'a,Node:NodeTrait> TraceGuard<'a,Node>{
+    pub fn new(trace:&Trace) -> TraceGuard{
+        TraceGuard{
+            trace:trace,
+        }
+    }
+}
+
+impl<'a,Node:NodeTrait> Drop for TraceGuard<'a,Node>{
+    fn drop(&mut self){
+        trace.pop();
+    }
+}
+*/
+
 /*
 impl From<i32> for Error {
     fn from(n:i32) -> Error {

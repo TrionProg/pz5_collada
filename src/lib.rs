@@ -5,16 +5,21 @@ extern crate byteorder;
 mod error;
 pub use error::Error;
 
-mod source;
-pub use source::{VirtualSource,VirtualSourceLayer};
+pub mod from_collada;
 
-mod lod;
-pub use lod::{/*LOD,*/VirtualLOD};
+pub use from_collada::lod::FromColladaLOD;
+pub use from_collada::mesh::FromColladaMesh;
+pub use from_collada::model::FromColladaModel;
 
-mod mesh;
-pub use mesh::VirtualMesh;//{Mesh,GeometryType};
+/*
+mod route;
+pub use route::{StageDescriptionTrait};
 
-mod model;
-pub use model::Model;
+mod stage_description;
+pub use stage_description::StageDescription;
+
+pub type Stage=route::Stage<StageDescription>;
+pub type Route=route::Route<StageDescription>;
+*/
 
 use std::path::Path;

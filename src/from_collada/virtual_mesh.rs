@@ -1,61 +1,8 @@
-/*
-pub enum GeometryType{
-    Triangles
-}
-
-impl GeometryType{
-    pub fn vertices(&self) -> usize{
-        match *self{
-            GeometryType::Triangles => 3,
-        }
-    }
-}
-
-pub struct VertexP3{
-    pub p:[f32; 3],
-}
-
-#[derive(RustcEncodable, RustcDecodable, PartialEq, Clone)]
-pub struct VertexP3N3{
-    pub p:[f32; 3],
-    pub n:[f32; 3],
-}
-
-pub struct VertexP3N3T0C2{
-    pub p:[f32; 3],
-    pub n:[f32; 3],
-    pub tc:[f32;2],
-}
-
-pub struct VertexP3N3Bone{
-    pub p:[f32; 3],
-    pub n:[f32; 3],
-    pub bone:usize,
-}
-
-pub struct VertexP3N3T0C2Bone{
-    pub p:[f32; 3],
-    pub n:[f32; 3],
-    pub tc:[f32;2],
-    pub bone:usize,
-}
-
-pub struct Lod<V>{
-    pub distance:f32,
-    pub vertices:Vec<V>,
-}
-*/
-use Error;
+use std;
 use pz5;
 use collada;
-use std::collections::btree_map::Entry::{Occupied, Vacant};
+use Error;
 
-//use LOD;
-
-pub enum GeometryType{
-    Lines,
-    Triangles,
-}
 
 /*
 pub struct Mesh<V>{
@@ -122,14 +69,22 @@ pub trait Mesh{
 
 //impl<V> Mesh<V>{
 
-use VirtualLOD;
+use from_collada::VirtualLOD;
 
 pub struct VirtualMesh<'a>{
     pub name:String,
     pub full_semantics:String,
     pub lods:Vec<VirtualLOD<'a>>,
-    pub vertex_count_per_polygon:usize,
+    pub geometry_type:pz5::GeometryType,
 }
+
+impl<'a> VirtualMesh<'a>{
+    pub fn check(&self) -> Result<(),Error>{
+        //TODO:check geometry_type, number of vertices etc
+        Ok(())
+    }
+}
+
 /*
 pub struct Mesh{
     pub name:String,
