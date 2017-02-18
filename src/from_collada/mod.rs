@@ -1,5 +1,5 @@
 mod source;
-pub use self::source::{VirtualSource,VirtualSourceLayer};
+pub use self::virtual_source::{VirtualSource,VirtualSourceLayer};
 
 pub mod virtual_lod;
 pub use self::virtual_lod::VirtualLOD;

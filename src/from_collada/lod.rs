@@ -4,7 +4,7 @@ use collada;
 use byteorder;
 use Error;
 
-use pz5::Pz5LOD;
+use pz5::ToPz5LOD;
 
 use from_collada::VirtualLOD;
 
@@ -12,7 +12,7 @@ use byteorder::LittleEndian;
 use byteorder::WriteBytesExt;
 
 
-pub trait FromColladaLOD: Pz5LOD{
+pub trait FromColladaLOD: ToPz5LOD{
     type Error:From<Error>;
 
     fn build<F>(virtual_lod:&VirtualLOD,build_lod:&F) -> Result<Self,Self::Error>

@@ -3,8 +3,8 @@ use pz5;
 use collada;
 use Error;
 
-use pz5::Pz5Model;
-use pz5::Pz5Mesh;
+use pz5::ToPz5Model;
+use pz5::ToPz5Mesh;
 use FromColladaMesh;
 
 use from_collada::VirtualModel;
@@ -14,7 +14,7 @@ use std::path::Path;
 use std::collections::HashMap;
 use std::collections::hash_map::Entry;
 
-pub trait FromColladaModel: Pz5Model{
+pub trait FromColladaModel: ToPz5Model{
     type Mesh:FromColladaMesh<Error=Self::Error>;
     type Error:From<Error>;
 

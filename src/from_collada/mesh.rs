@@ -3,14 +3,14 @@ use pz5;
 use collada;
 use Error;
 
-use pz5::Pz5Mesh;
+use pz5::ToPz5Mesh;
 
 use FromColladaLOD;
 
 use from_collada::VirtualMesh;
 use from_collada::VirtualLOD;
 
-pub trait FromColladaMesh: Pz5Mesh{
+pub trait FromColladaMesh: ToPz5Mesh{
     type LOD:FromColladaLOD<Error=Self::Error>;
     type Error:From<Error>;
 
