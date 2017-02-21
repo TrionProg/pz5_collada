@@ -2,32 +2,32 @@ use std;
 use pz5;
 use collada;
 use byteorder;
-use Error;
+
+use std::rc::Rc;
 
 use pz5::ToPz5LOD;
-
-use from_collada::VirtualLOD;
-
 use byteorder::LittleEndian;
 use byteorder::WriteBytesExt;
 
+use super::Error;
+use super::VirtualLOD;
 
-pub trait FromColladaLOD: ToPz5LOD{
+
+pub trait FromColladaLOD:Sized{
     type Error:From<Error>;
 
     fn build<F>(virtual_lod:&VirtualLOD,build_lod:&F) -> Result<Self,Self::Error>
         where
-            F:Fn(&VirtualLOD,Vec<u8>) -> Result<Self,Self::Error>
+            F:Fn(&VirtualLOD,Rc<collada::Mesh>) -> Result<Self,Self::Error>
     {
-        let data=match Self::build_geometry(virtual_lod){
-            Ok ( d ) => d,
-            Err( e ) => return Err(Self::Error::from(e)),
-        };
+        let lod=build_lod(virtual_lod,virtual_lod.geometry.clone())?;
 
-        let lod=build_lod(virtual_lod,data)?;
         Ok(lod)
     }
 
+    //и днлжен быть метод для конвертирования геометрии в pz5 шную при заданной семантике
+
+/*
     fn build_geometry(virtual_lod:&VirtualLOD) -> Result<Vec<u8>,Error>{
         /*
         TODO:add indexes
@@ -96,4 +96,5 @@ pub trait FromColladaLOD: ToPz5LOD{
 
         Ok(data)
     }
+*/
 }

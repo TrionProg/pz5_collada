@@ -1,15 +1,16 @@
-use Error;
+use std;
 use pz5;
 use collada;
 use std::path::Path;
-//use {Stage, StageDescription};
 
 use std::collections::HashMap;
 use std::collections::hash_map::Entry;
 use std::rc::Rc;
 
-use from_collada::VirtualMesh;
-use from_collada::VirtualLOD;
+use super::VirtualMesh;
+use super::VirtualLOD;
+
+use super::Error;
 
 pub struct VirtualModel;
 
@@ -60,15 +61,12 @@ impl VirtualModel{
                     }
                 };
 
-                let smt=String::from("VERTEX:(X:float,Z:float,Y:float) NORMAL:(X:float,Y:float,Z:float)");
-                let semantics=pz5::Semantics::parse(&smt).unwrap();
-                //TODO:When and where use semantics from config, maybe mesh info should need
-
-                let virtual_lod=VirtualLOD::construct(&mesh, distance, &semantics)?;
+                let virtual_lod=VirtualLOD::construct(&mesh, distance)?;
 
                 match virtual_meshes.entry(mesh_name.clone()){
                     Entry::Vacant(entry) => {
                         let geometry_type=virtual_lod.geometry_type;
+                        let full_vertex_format=virtual_lod.geometry.full_vertex_format.clone();
 
                         let mut lods=Vec::with_capacity(1);
                         lods.push(virtual_lod);
@@ -76,7 +74,7 @@ impl VirtualModel{
                         entry.insert(
                             VirtualMesh{
                                 name:mesh_name,
-                                full_semantics:smt.clone(),
+                                full_vertex_format:full_vertex_format,
                                 lods:lods,
                                 geometry_type:geometry_type,
                             }
@@ -90,16 +88,6 @@ impl VirtualModel{
 
         for (_,virtual_mesh) in virtual_meshes.iter_mut(){
             virtual_mesh.lods.sort_by(|lod1,lod2| lod1.distance.partial_cmp(&lod2.distance).unwrap());
-
-            if virtual_mesh.lods[0].distance!=0.0 {
-                return Err( Error::Other( format!("Mesh \"{}\" must have LOD with 0 distance", virtual_mesh.name) ) );
-            }
-
-            for (lod1,lod2) in virtual_mesh.lods.iter().zip(virtual_mesh.lods.iter().skip(1)){
-                if lod1.distance==lod2.distance {
-                    return Err( Error::Other( format!("Mesh \"{}\" has LODS with same distance", virtual_mesh.name) ) );
-                }
-            }
         }
 
         for (_,virtual_mesh) in virtual_meshes.iter(){

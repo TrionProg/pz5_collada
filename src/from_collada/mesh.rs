@@ -1,18 +1,24 @@
 use std;
 use pz5;
 use collada;
-use Error;
+
+use std::rc::Rc;
 
 use pz5::ToPz5Mesh;
 
-use FromColladaLOD;
+use super::Error;
 
-use from_collada::VirtualMesh;
-use from_collada::VirtualLOD;
+use super::FromColladaLOD;
 
-pub trait FromColladaMesh: ToPz5Mesh{
+use super::VirtualMesh;
+use super::VirtualLOD;
+
+pub trait FromColladaMesh:Sized{
     type LOD:FromColladaLOD<Error=Self::Error>;
+    type Container:From<Self::LOD> + std::borrow::Borrow<Self::LOD>;
     type Error:From<Error>;
+
+    fn get_name(&self) -> &String;
 
     fn build<F>(virtual_mesh:&VirtualMesh,build_mesh:&F) -> Result<Self,Self::Error>
         where
@@ -22,16 +28,16 @@ pub trait FromColladaMesh: ToPz5Mesh{
         Ok(mesh)
     }
 
-    fn build_lods<F>(virtual_mesh:&VirtualMesh,build_lod:F) -> Result<Vec< <Self as FromColladaMesh>::LOD>,Self::Error>
+    fn build_lods<F>(virtual_mesh:&VirtualMesh,build_lod:F) -> Result<Vec<Self::Container>,Self::Error>
         where
-            F:Fn(&VirtualLOD,Vec<u8>) -> Result< <Self as FromColladaMesh>::LOD,Self::Error>
+            F:Fn(&VirtualLOD,Rc<collada::Mesh>) -> Result< <Self as FromColladaMesh>::LOD,Self::Error>
     {
         let mut lods=Vec::with_capacity(virtual_mesh.lods.len());
 
         for virtual_lod in virtual_mesh.lods.iter(){
             let lod = <Self as FromColladaMesh>::LOD::build(virtual_lod,&build_lod)?;
 
-            lods.push(lod);
+            lods.push(Self::Container::from(lod));
         }
 
         Ok(lods)

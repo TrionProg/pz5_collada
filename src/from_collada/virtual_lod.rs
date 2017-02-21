@@ -1,44 +1,33 @@
 use std;
 use pz5;
 use collada;
-use Error;
 
-use from_collada::VirtualSource;
+use std::rc::Rc;
+
+use super::Error;
 
 pub struct VirtualLOD<'a>{
     pub distance:f32,
     pub geometry_type:pz5::GeometryType,
-    pub sources:Vec<VirtualSource<'a>>,
+    pub geometry:&'a Rc<collada::Mesh>,
     pub vertices_count:usize,
 }
 
 impl<'a> VirtualLOD<'a>{
-    pub fn construct(collada_mesh:&'a collada::Mesh, distance:f32, semantics:&pz5::Semantics) -> Result<VirtualLOD<'a>,Error>{
+    pub fn construct(collada_mesh:&'a Rc<collada::Mesh>, distance:f32) -> Result<VirtualLOD<'a>,Error>{
+        let vertices_count=match collada_mesh.vertex_indices.iter().next(){
+            Some( (_,vertex_indices) ) =>
+                vertex_indices.indices.len(),
+            None => return Err( Error::NoVertices ),
+        };
+
         let geometry_type=Self::get_geometry_type(collada_mesh)?;
-
-        let mut sources=Vec::new();
-
-        for semantics_source in semantics.sources.iter(){
-            let virtual_source=VirtualSource::construct(collada_mesh, semantics_source)?;
-
-            sources.push(virtual_source);
-        }
-
-        if sources.len()==0 {
-            return Err( Error::Other(String::from("LOD has no sources")) );
-        }
-
-        let vertices_count=sources[0].vertex_layer.indexes.len();
-
-        if vertices_count==0 {
-            return Err( Error::Other(String::from("LOD has no vertices")) );
-        }
 
         Ok(
             VirtualLOD{
                 distance:distance,
                 geometry_type:geometry_type,
-                sources:sources,
+                geometry:collada_mesh,
                 vertices_count:vertices_count,
             }
         )
@@ -46,7 +35,7 @@ impl<'a> VirtualLOD<'a>{
 
     fn get_geometry_type(collada_mesh:&collada::Mesh) -> Result<pz5::GeometryType,Error>{
         if collada_mesh.polygons.len()==0 {
-            return Err(Error::Other( String::from(" has no polygons") ));
+            return Err( Error::NoPolygons );
         }
 
         let vertex_count_per_polygon=collada_mesh.polygons[0].vertices_count;
@@ -59,7 +48,7 @@ impl<'a> VirtualLOD<'a>{
 
         match pz5::GeometryType::from_vertices_count(vertex_count_per_polygon){
             Ok( gt ) => Ok(gt),
-            Err( e ) => Err(Error::Other(e)),
+            Err( e ) => Err( Error::Other(e) ),
         }
     }
 }

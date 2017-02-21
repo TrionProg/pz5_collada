@@ -2,14 +2,14 @@ extern crate pz5;
 extern crate collada;
 extern crate byteorder;
 
-mod error;
-pub use error::Error;
+//mod error;
+//pub use error::Error;
 
 pub mod from_collada;
 
-pub use from_collada::lod::FromColladaLOD;
-pub use from_collada::mesh::FromColladaMesh;
-pub use from_collada::model::FromColladaModel;
+//pub use from_collada::lod::FromColladaLOD;
+//pub use from_collada::mesh::FromColladaMesh;
+//pub use from_collada::model::FromColladaModel;
 
 /*
 mod route;

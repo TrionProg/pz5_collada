@@ -1,36 +1,38 @@
 use std;
 use pz5;
 use collada;
-use Error;
-
-use pz5::ToPz5Model;
-use pz5::ToPz5Mesh;
-use FromColladaMesh;
-
-use from_collada::VirtualModel;
-use from_collada::VirtualMesh;
 
 use std::path::Path;
 use std::collections::HashMap;
 use std::collections::hash_map::Entry;
 
-pub trait FromColladaModel: ToPz5Model{
+use pz5::ToPz5Model;
+use pz5::ToPz5Mesh;
+
+use super::Error;
+
+use super::FromColladaMesh;
+use super::VirtualModel;
+use super::VirtualMesh;
+
+pub trait FromColladaModel:Sized{
     type Mesh:FromColladaMesh<Error=Self::Error>;
+    type Container:From<Self::Mesh> + std::borrow::Borrow<Self::Mesh>;
     type Error:From<Error>;
 
-    fn read_collada<F>(file_name:&Path,build_model:F) -> Result<Self,Self::Error>
+    fn build<F>(file_name:&Path,build_model:F) -> Result<Self,Self::Error>
         where
             F:FnOnce(&collada::Document,&HashMap<String,VirtualMesh>) -> Result<Self,Self::Error>
     {
-        let document=VirtualModel::parse_collada(file_name).unwrap();//TODO:Error instead Unwrap
+        let document=VirtualModel::parse_collada(file_name)?;
 
-        let virtual_meshes=VirtualModel::generate_virtual_meshes(&document).unwrap();
+        let virtual_meshes=VirtualModel::generate_virtual_meshes(&document)?;
 
         let model=build_model(&document,&virtual_meshes)?;
         Ok(model)
     }
 
-    fn build_meshes<F>(virtual_meshes:&HashMap<String,VirtualMesh>,build_mesh:F) -> Result<HashMap<String, <Self as FromColladaModel>::Mesh>,Self::Error>
+    fn build_meshes<F>(virtual_meshes:&HashMap<String,VirtualMesh>,build_mesh:F) -> Result<HashMap<String, Self::Container>,Self::Error>
         where
             F:Fn(&VirtualMesh) -> Result< <Self as FromColladaModel>::Mesh,Self::Error>
     {
@@ -43,7 +45,7 @@ pub trait FromColladaModel: ToPz5Model{
                 Entry::Occupied( _ ) => return Err(Self::Error::from(
                     Error::Other( format!("Mesh \"{}\" already exists",mesh.get_name()) )
                 )),
-                Entry::Vacant( e ) => {e.insert(mesh);},
+                Entry::Vacant( e ) => {e.insert(Self::Container::from(mesh));},
             }
         }
 
