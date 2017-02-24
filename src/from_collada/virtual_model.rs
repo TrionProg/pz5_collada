@@ -66,7 +66,7 @@ impl VirtualModel{
                 match virtual_meshes.entry(mesh_name.clone()){
                     Entry::Vacant(entry) => {
                         let geometry_type=virtual_lod.geometry_type;
-                        let full_vertex_format=virtual_lod.geometry.full_vertex_format.clone();
+                        let vertex_format=virtual_lod.geometry.vertex_format.clone();
 
                         let mut lods=Vec::with_capacity(1);
                         lods.push(virtual_lod);
@@ -74,7 +74,7 @@ impl VirtualModel{
                         entry.insert(
                             VirtualMesh{
                                 name:mesh_name,
-                                full_vertex_format:full_vertex_format,
+                                vertex_format:vertex_format,
                                 lods:lods,
                                 geometry_type:geometry_type,
                             }

@@ -4,6 +4,9 @@
 pub mod error;
 pub use self::error::Error;
 
+pub mod geometry;
+pub use self::geometry::Geometry;
+
 pub mod virtual_lod;
 pub use self::virtual_lod::VirtualLOD;
 

@@ -12,6 +12,7 @@ use super::FromColladaLOD;
 
 use super::VirtualMesh;
 use super::VirtualLOD;
+use super::Geometry;
 
 pub trait FromColladaMesh:Sized{
     type LOD:FromColladaLOD<Error=Self::Error>;
@@ -30,7 +31,7 @@ pub trait FromColladaMesh:Sized{
 
     fn build_lods<F>(virtual_mesh:&VirtualMesh,build_lod:F) -> Result<Vec<Self::Container>,Self::Error>
         where
-            F:Fn(&VirtualLOD,Rc<collada::Mesh>) -> Result< <Self as FromColladaMesh>::LOD,Self::Error>
+            F:Fn(&VirtualLOD,Geometry) -> Result< <Self as FromColladaMesh>::LOD,Self::Error>
     {
         let mut lods=Vec::with_capacity(virtual_mesh.lods.len());
 

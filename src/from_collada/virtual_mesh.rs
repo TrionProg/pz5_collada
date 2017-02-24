@@ -8,7 +8,7 @@ use super::VirtualLOD;
 
 pub struct VirtualMesh<'a>{
     pub name:String,
-    pub full_vertex_format:String,
+    pub vertex_format:String,
     pub lods:Vec<VirtualLOD<'a>>,
     pub geometry_type:pz5::GeometryType,
 }
