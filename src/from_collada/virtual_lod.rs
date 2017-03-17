@@ -2,19 +2,19 @@ use std;
 use pz5;
 use collada;
 
-use std::rc::Rc;
+use std::sync::Arc;
 
 use super::Error;
 
 pub struct VirtualLOD<'a>{
     pub distance:f32,
     pub geometry_type:pz5::GeometryType,
-    pub geometry:&'a Rc<collada::Mesh>,
+    pub geometry:&'a Arc<collada::Mesh>,
     pub vertices_count:usize,
 }
 
 impl<'a> VirtualLOD<'a>{
-    pub fn construct(collada_mesh:&'a Rc<collada::Mesh>, distance:f32) -> Result<VirtualLOD<'a>,Error>{
+    pub fn construct(collada_mesh:&'a Arc<collada::Mesh>, distance:f32) -> Result<VirtualLOD<'a>,Error>{
         let vertices_count=match collada_mesh.vertex_indices.iter().next(){
             Some( (_,vertex_indices) ) =>
                 vertex_indices.indices.len(),

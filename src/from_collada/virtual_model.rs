@@ -5,7 +5,7 @@ use std::path::Path;
 
 use std::collections::HashMap;
 use std::collections::hash_map::Entry;
-use std::rc::Rc;
+use std::sync::Arc;
 
 use super::VirtualMesh;
 use super::VirtualLOD;
@@ -75,6 +75,10 @@ impl VirtualModel{
                             VirtualMesh{
                                 name:mesh_name,
                                 vertex_format:vertex_format,
+                                position:pz5::Pos3D::new(node.position.x, node.position.y, node.position.z),
+                                rotation:pz5::Euler::new(node.rotation.pitch, node.rotation.yaw,node. rotation.roll),
+                                scale:pz5::Scale3D::new(node.scale.x, node.scale.y, node.scale.z),
+
                                 lods:lods,
                                 geometry_type:geometry_type,
                             }

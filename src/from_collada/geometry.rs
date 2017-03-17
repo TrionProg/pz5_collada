@@ -3,7 +3,7 @@ use pz5;
 use collada;
 use byteorder;
 
-use std::rc::Rc;
+use std::sync::Arc;
 use byteorder::LittleEndian;
 use byteorder::WriteBytesExt;
 
@@ -11,7 +11,7 @@ use super::Error;
 
 pub struct Geometry{
     pub vertices_count:usize,
-    pub collada_mesh:Rc<collada::Mesh>,
+    pub collada_mesh:Arc<collada::Mesh>,
 }
 
 use pz5::vertex_format::VertexFormat;
@@ -19,7 +19,7 @@ use pz5::vertex_format::VertexFormatSourceLayerType;
 use pz5::Pz5Geometry;
 
 impl Geometry{
-    pub fn new(collada_mesh:Rc<collada::Mesh>) -> Geometry{
+    pub fn new(collada_mesh:Arc<collada::Mesh>) -> Geometry{
         let vertices_count=match collada_mesh.vertex_indices.iter().next(){
             Some( (_,vi) ) => vi.indices.len(),
             None => panic!("Mesh \"{}\" has no sources", collada_mesh.name),
